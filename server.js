@@ -57,12 +57,11 @@ function lerProdutos() {
             return {
                 id: parseInt(id),
                 nome: nome || '',
-                descricao: descricao || '',
+                descricao: (descricao || '').replace(/\\n/g, '\n'),
                 imagem: imagem || '',
                 dataCadastro: dataCadastro || new Date().toISOString()
             };
         });
-        
         return produtos;
     } catch (error) {
         console.error('Erro ao ler produtos:', error);
@@ -74,7 +73,7 @@ function lerProdutos() {
 function salvarProdutos(produtos) {
     try {
         const linhas = produtos.map(p => 
-            `${p.id}|${p.nome}|${p.descricao}|${p.imagem}|${p.dataCadastro}`
+            `${p.id}|${p.nome}|${(p.descricao || '').replace(/\n/g, '\\n')}|${p.imagem}|${p.dataCadastro}`
         );
         fs.writeFileSync(PRODUTOS_FILE, linhas.join('\n'), 'utf8');
         return true;

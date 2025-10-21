@@ -269,7 +269,9 @@ function renderizarProdutos(produtos) {
         return;
     }
     
-    const produtosHTML = produtos.map(produto => `
+    const produtosHTML = produtos.map(produto => {
+        const descricaoFormatada = (produto.descricao || 'Sem descrição').replace(/\n/g, '<br>');
+        return `
         <div class="product-item" data-id="${produto.id}">
             <div class="product-content">
                 <div class="product-image-placeholder">
@@ -277,7 +279,7 @@ function renderizarProdutos(produtos) {
                 </div>
                 <div class="product-info">
                     <h4>${produto.nome}</h4>
-                    <p>${produto.descricao || 'Sem descrição'}</p>
+                    <p>${descricaoFormatada}</p>
                 </div>
             </div>
             <div class="item-actions">
@@ -285,7 +287,8 @@ function renderizarProdutos(produtos) {
                 <button class="btn btn-delete" onclick="excluirProduto(${produto.id})">Excluir</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
     
     produtosContainer.innerHTML = produtosHTML;
 }
