@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sistema de Chatbot - Consultor Virtual
 
 Sistema web para gestão de produtos com consultor virtual (chatbot) para recomendação de produtos.
@@ -128,3 +129,7 @@ ID|NOME|DESCRIÇÃO|IMAGEM|DATA_CADASTRO
 
 Este projeto é de uso educacional.
 
+=======
+# consultor-virtual
+Chatbot bot especilista, em indicar o melhor produto para o cliente de acordo com suas necessidades.
+>>>>>>> c94524b27abebaaa4e13e488ee9964bdad12077f
