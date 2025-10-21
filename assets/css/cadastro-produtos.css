@@ -1,0 +1,287 @@
+/* CSS específico para a página de Cadastro de Produtos */
+
+/* Header customizado com badge CAF */
+#pageContent .content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.header-caf {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 8px 20px;
+  font-weight: bold;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Layout Principal em Duas Colunas */
+.container {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+}
+
+/* Seção do Formulário (Esquerda) */
+.form-section {
+  flex: 3; /* Ocupa uma proporção maior (ex: 3/4) */
+  padding: 30px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.new-product-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.new-product-header h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.new-product-header p {
+  color: var(--color-text-light);
+  font-size: 0.9em;
+  margin: 0;
+}
+
+.icon-plus {
+  font-size: 2.2em;
+  font-weight: bold;
+  margin-right: 15px;
+  line-height: 1;
+  color: var(--color-text-dark);
+}
+
+/* Estilos de Formulário */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+  color: var(--color-text-dark);
+}
+
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 1em;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-dark-blue);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Upload de Arquivo */
+.file-upload-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border: 2px dashed var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #F8F8F8;
+  color: var(--color-text-light);
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.file-upload-box:hover {
+  border-color: var(--color-dark-blue);
+  background-color: #F0F0F0;
+}
+
+.file-upload-box .icon-plus {
+  font-size: 1.5em;
+  margin-right: 8px;
+}
+
+/* Botões */
+.form-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1em;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--color-dark-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0000b0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.3);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.btn-secondary:hover {
+  background-color: #ffeeee;
+  transform: translateY(-1px);
+}
+
+/* Seção Lateral (Direita) - Produtos Recentes */
+.recent-section {
+  flex: 1.2; /* Ocupa uma proporção menor */
+  background-color: var(--color-aside-bg);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.recent-section h3 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: var(--color-text-dark);
+}
+
+.product-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.product-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.product-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.product-image-placeholder {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border: 2px dashed var(--color-border);
+  margin-right: 15px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: var(--color-text-light);
+  background-color: white;
+}
+
+.product-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.product-info h4 {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--color-text-dark);
+}
+
+.product-info p {
+  font-size: 0.85em;
+  color: var(--color-text-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+/* Ajuste para input/textarea placeholder com cor clara */
+#pageContent ::placeholder {
+  color: #A9A9A9;
+  opacity: 1;
+}
+
+/* Responsividade para a página de cadastro */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .form-section,
+  .recent-section {
+    flex: 1;
+    width: 100%;
+  }
+  
+  .recent-section {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 20px;
+  }
+  
+  .recent-section {
+    padding: 20px;
+  }
+  
+  .new-product-header {
+    flex-direction: column;
+  }
+  
+  .icon-plus {
+    margin-bottom: 10px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}

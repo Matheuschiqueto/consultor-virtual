@@ -1,0 +1,51 @@
+<div class="content-header">
+    <h1>Cadastro de Produtos</h1>
+    <div class="header-caf">CAF</div>
+</div>
+
+<div class="container">
+    <div class="form-section">
+        <div class="new-product-header">
+            <span class="icon-plus">+</span>
+            <div>
+                <h2>Novo produto</h2>
+                <p>Adicione um novo produto</p>
+            </div>
+        </div>
+
+        <form id="formCadastroProduto">
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" placeholder="Digite o nome do produto...">
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" placeholder="Digite a descrição do produto..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Imagem</label>
+                <div class="file-upload-box">
+                    <span class="icon-plus">+</span>
+                    <span>Adicionar ficheiros</span>
+                    <input type="file" multiple style="display: none;">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                <button type="button" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </div>
+    
+    <aside class="recent-section">
+        <h3>Adicionados recentemente</h3>
+        <!-- Produtos recentes serão carregados dinamicamente aqui -->
+        <div style="text-align:center;padding:40px;color:#999;">
+            <p>📦 Nenhum produto cadastrado ainda</p>
+            <p style="font-size:0.85em;">Cadastre produtos para vê-los aqui</p>
+        </div>
+    </aside>
+</div>
