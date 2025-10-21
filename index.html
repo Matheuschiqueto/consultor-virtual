@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão - Chatbot</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/cadastro-produtos.css">
+    <link rel="stylesheet" href="assets/css/produtos-cadastrados.css">
+    <link rel="stylesheet" href="assets/css/chat.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Menu Toggle para Mobile -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Barra Lateral -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Sistema Chatbot</h2>
+        </div>
+        <nav>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="pages/cadastro-produtos.html" class="nav-link" data-page="cadastro-produtos">
+                        <i class="fas fa-plus-circle"></i>
+                        Cadastro Produtos
+                    </a>
+                </li>
+                <li>
+                    <a href="pages/produtos-cadastrados.html" class="nav-link" data-page="produtos-cadastrados">
+                        <i class="fas fa-list"></i>
+                        Produtos Cadastrados
+                    </a>
+                </li>
+                <li>
+                    <a href="pages/chat.html" class="nav-link" data-page="chat">
+                        <i class="fas fa-comments"></i>
+                        Chat
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <div id="pageContent">
+            <!-- O conteúdo das páginas será carregado aqui -->
+            <div class="content-header">
+                <h1>Bem-vindo ao Sistema</h1>
+            </div>
+            <p>Selecione uma opção no menu lateral para começar.</p>
+        </div>
+    </main>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/produtos.js"></script>
+</body>
+</html>
