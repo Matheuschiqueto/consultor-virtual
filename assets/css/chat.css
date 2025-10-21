@@ -1,0 +1,167 @@
+/* CSS específico para a página de Chat */
+
+/* Variáveis de Cores adicionais para o chat */
+:root {
+  --color-red-light: #FEEEEE; /* Fundo do botão selecionado */
+  --color-border-light: #ccc;
+}
+
+/* Container do Chat */
+.chat-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: 600px;
+}
+
+/* Mensagem de Chat (Bot) */
+.chat-message {
+  display: flex;
+  margin-bottom: 30px;
+  align-items: flex-start;
+}
+
+.bot-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  margin-right: 15px;
+  background: transparent;
+  font-size: 2em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-content {
+  flex-grow: 1;
+}
+
+.message-content p {
+  margin-bottom: 15px;
+  font-size: 1em;
+  font-weight: 500;
+  color: var(--color-text-dark);
+}
+
+/* Botões de Opção */
+.option-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.option-buttons.vertical {
+  flex-direction: column;
+}
+
+.btn-option {
+  padding: 10px 20px;
+  border-radius: 20px; /* Borda bem arredondada para botões de opção */
+  border: 2px solid var(--color-primary);
+  background-color: white;
+  color: var(--color-primary);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9em;
+  font-family: inherit;
+  text-align: left;
+}
+
+.btn-option:hover {
+  background-color: var(--color-red-light);
+  transform: translateY(-1px);
+}
+
+/* Estilo para opções selecionadas */
+.btn-option.selected {
+  background-color: var(--color-red-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Estilo para opções ativas (preenchidas) */
+.btn-option.active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.btn-option.active:hover {
+  background-color: #b82828;
+  border-color: #b82828;
+}
+
+/* Área de Input de Texto */
+.input-area {
+  margin-top: 50px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.input-area input[type="text"] {
+  width: 100%;
+  padding: 14px 15px;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  font-size: 1em;
+  outline: none;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+
+.input-area input[type="text"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(208, 49, 49, 0.1);
+}
+
+.input-area input[type="text"]::placeholder {
+  color: #A9A9A9;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .chat-container {
+    padding: 20px;
+  }
+
+  .option-buttons:not(.vertical) {
+    flex-direction: column;
+  }
+
+  .btn-option {
+    width: 100%;
+    text-align: center;
+  }
+
+  .message-content p {
+    font-size: 0.95em;
+  }
+
+  .bot-icon {
+    font-size: 1.5em;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-container {
+    padding: 15px;
+  }
+
+  .chat-message {
+    margin-bottom: 20px;
+  }
+
+  .bot-icon {
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    margin-right: 10px;
+  }
+}
+
