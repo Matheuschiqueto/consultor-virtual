@@ -114,6 +114,9 @@ function exibirPerguntas(perguntas) {
             `}
             
             <div class="pergunta-actions">
+                <button class="btn-edit" onclick="editarPergunta(${pergunta.id})">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
                 <button class="btn-delete" onclick="excluirPergunta(${pergunta.id})">
                     <i class="fas fa-trash"></i> Excluir
                 </button>
@@ -132,6 +135,132 @@ function atualizarContador(total) {
     const contador = document.querySelector('.pergunta-summary p');
     if (contador) {
         contador.textContent = `${total} Pergunta${total !== 1 ? 's' : ''} Cadastrada${total !== 1 ? 's' : ''}`;
+    }
+}
+
+// ========== EDIÇÃO DE PERGUNTAS ==========
+
+async function editarPergunta(id) {
+    try {
+        console.log('✏️ Editando pergunta ID:', id);
+        // Buscar dados da pergunta
+        const response = await fetch(`/api/perguntas/${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const pergunta = data.pergunta;
+            
+            // Navegar para a tela de cadastro
+            const navLink = document.querySelector('[data-page="cadastro-perguntas"]');
+            if (navLink) {
+                navLink.click();
+                
+                // Aguardar a página carregar e então preencher o formulário
+                setTimeout(() => {
+                    preencherFormularioEdicaoPergunta(pergunta);
+                }, 300);
+            }
+        } else {
+            mostrarMensagem('Pergunta não encontrada', 'erro');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao buscar pergunta:', error);
+        mostrarMensagem('Erro ao carregar pergunta para edição', 'erro');
+    }
+}
+
+function preencherFormularioEdicaoPergunta(pergunta) {
+    // Preencher campos do formulário
+    const perguntaInput = document.getElementById('pergunta');
+    const tipoSelect = document.getElementById('tipo');
+    const ordemInput = document.getElementById('ordem');
+    
+    if (perguntaInput) perguntaInput.value = pergunta.pergunta || '';
+    if (tipoSelect) tipoSelect.value = pergunta.tipo || '';
+    if (ordemInput) ordemInput.value = pergunta.ordem || '';
+    
+    // Atualizar interface baseada no tipo
+    if (tipoSelect) {
+        atualizarInterfaceTipo();
+    }
+    
+    // Preencher opções se existirem
+    if (pergunta.opcoes && pergunta.opcoes.length > 0) {
+        const opcoesList = document.getElementById('opcoes-list');
+        if (opcoesList) {
+            // Limpar opções existentes
+            opcoesList.innerHTML = '';
+            
+            // Adicionar cada opção
+            pergunta.opcoes.forEach((opcao, index) => {
+                const opcaoItem = document.createElement('div');
+                opcaoItem.className = 'opcao-item';
+                
+                const requiredAttr = pergunta.tipo === 'multipla-escolha' ? 'required' : '';
+                
+                opcaoItem.innerHTML = `
+                    <input type="text" placeholder="Digite uma opção de resposta..." class="opcao-input" value="${opcao}" ${requiredAttr}>
+                    <button type="button" class="btn-remove-opcao" onclick="removerOpcao(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                
+                opcoesList.appendChild(opcaoItem);
+            });
+        }
+    }
+    
+    // Atualizar título da seção
+    const headerTitulo = document.querySelector('.new-pergunta-header h2');
+    if (headerTitulo) {
+        headerTitulo.textContent = 'Editar pergunta';
+    }
+    
+    const headerDescricao = document.querySelector('.new-pergunta-header p');
+    if (headerDescricao) {
+        headerDescricao.textContent = `Editando: ${pergunta.pergunta}`;
+    }
+    
+    // Atualizar botões
+    const btnCadastrar = document.querySelector('.btn-primary');
+    if (btnCadastrar) {
+        btnCadastrar.textContent = 'Atualizar';
+        btnCadastrar.setAttribute('data-editing', pergunta.id);
+    }
+    
+    const btnCancelar = document.querySelector('.btn-secondary');
+    if (btnCancelar) {
+        btnCancelar.textContent = 'Cancelar Edição';
+        btnCancelar.setAttribute('data-editing', pergunta.id);
+    }
+    
+    mostrarMensagem(`Editando pergunta: ${pergunta.pergunta}`, 'info');
+}
+
+function resetarFormularioCadastroPergunta() {
+    // Restaurar título da seção
+    const headerTitulo = document.querySelector('.new-pergunta-header h2');
+    if (headerTitulo) {
+        headerTitulo.textContent = 'Nova pergunta';
+    }
+    
+    const headerDescricao = document.querySelector('.new-pergunta-header p');
+    if (headerDescricao) {
+        headerDescricao.textContent = 'Adicione uma nova pergunta';
+    }
+    
+    // Restaurar botão de cadastrar
+    const btnCadastrar = document.querySelector('.btn-primary');
+    if (btnCadastrar) {
+        btnCadastrar.textContent = 'Cadastrar';
+        btnCadastrar.removeAttribute('data-editing');
+    }
+    
+    // Restaurar botão cancelar
+    const btnCancelar = document.querySelector('.btn-secondary');
+    if (btnCancelar) {
+        btnCancelar.textContent = 'Cancelar';
+        btnCancelar.removeAttribute('data-editing');
     }
 }
 
@@ -221,6 +350,38 @@ async function gerarRelatorio() {
 }
 
 // ========== FUNÇÕES AUXILIARES ==========
+
+// Atualizar interface baseada no tipo de pergunta
+function atualizarInterfaceTipo() {
+    const tipoSelect = document.getElementById('tipo');
+    if (!tipoSelect) {
+        console.error('Elemento tipo não encontrado');
+        return;
+    }
+    
+    const tipo = tipoSelect.value;
+    const opcoesContainer = document.getElementById('opcoes-container');
+    const opcoesRequired = document.getElementById('opcoes-required');
+    const opcaoInputs = document.querySelectorAll('.opcao-input');
+    
+    if (tipo === 'texto-livre') {
+        if (opcoesContainer) opcoesContainer.style.display = 'none';
+        if (opcoesRequired) opcoesRequired.style.display = 'none';
+        
+        // Remover required dos inputs de opção quando for texto livre
+        opcaoInputs.forEach(input => {
+            input.removeAttribute('required');
+        });
+    } else {
+        if (opcoesContainer) opcoesContainer.style.display = 'block';
+        if (opcoesRequired) opcoesRequired.style.display = 'inline';
+        
+        // Adicionar required nos inputs de opção quando for múltipla escolha
+        opcaoInputs.forEach(input => {
+            input.setAttribute('required', 'required');
+        });
+    }
+}
 
 // Obter label do tipo de pergunta
 function obterLabelTipo(tipo) {

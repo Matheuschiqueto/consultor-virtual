@@ -131,15 +131,19 @@ function removerOpcao(botao) {
     }
 }
 
-// Cadastrar nova pergunta
+// Cadastrar nova pergunta ou atualizar existente
 async function cadastrarPergunta(event) {
     event.preventDefault();
     
-    console.log('Iniciando cadastro de pergunta...');
+    console.log('Iniciando cadastro/edição de pergunta...');
     
     const pergunta = document.getElementById('pergunta').value.trim();
     const tipo = document.getElementById('tipo').value;
     const ordem = document.getElementById('ordem').value;
+    
+    // Verificar se está editando
+    const btnCadastrar = document.querySelector('.btn-primary');
+    const perguntaId = btnCadastrar ? btnCadastrar.getAttribute('data-editing') : null;
     
     // Validações obrigatórias
     if (!pergunta) {
@@ -154,8 +158,8 @@ async function cadastrarPergunta(event) {
         return;
     }
     
-    // Verificar se a ordem já existe
-    const ordemExistente = perguntasCadastradas.find(p => p.ordem === parseInt(ordem));
+    // Verificar se a ordem já existe (exceto se estiver editando a mesma pergunta)
+    const ordemExistente = perguntasCadastradas.find(p => p.ordem === parseInt(ordem) && p.id !== parseInt(perguntaId));
     if (ordemExistente) {
         mostrarMensagem(`A ordem ${ordem} já está sendo usada pela pergunta: "${ordemExistente.pergunta}". Escolha uma ordem diferente.`, 'erro');
         document.getElementById('ordem').focus();
@@ -186,15 +190,28 @@ async function cadastrarPergunta(event) {
         pergunta: pergunta,
         tipo: tipo,
         ordem: parseInt(ordem),
-        opcoes: opcoes,
-        dataCadastro: new Date().toISOString()
+        opcoes: opcoes
     };
+    
+    // Se estiver editando, não incluir dataCadastro
+    if (!perguntaId) {
+        dadosPergunta.dataCadastro = new Date().toISOString();
+    }
     
     console.log('Dados da pergunta:', dadosPergunta);
     
     try {
-        const response = await fetch('/api/perguntas', {
-            method: 'POST',
+        let url = '/api/perguntas';
+        let method = 'POST';
+        
+        if (perguntaId) {
+            // Atualizar pergunta existente
+            url = `/api/perguntas/${perguntaId}`;
+            method = 'PUT';
+        }
+        
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -205,15 +222,20 @@ async function cadastrarPergunta(event) {
         console.log('Resposta do servidor:', result);
         
         if (result.success) {
-            mostrarMensagem('Pergunta cadastrada com sucesso!', 'sucesso');
+            if (perguntaId) {
+                mostrarMensagem('Pergunta atualizada com sucesso!', 'sucesso');
+                resetarFormularioCadastroPergunta();
+            } else {
+                mostrarMensagem('Pergunta cadastrada com sucesso!', 'sucesso');
+            }
             limparFormulario();
             carregarPerguntas();
         } else {
-            mostrarMensagem('Erro ao cadastrar pergunta: ' + result.message, 'erro');
+            mostrarMensagem('Erro ao salvar pergunta: ' + result.message, 'erro');
         }
     } catch (error) {
-        console.error('Erro ao cadastrar pergunta:', error);
-        mostrarMensagem('Erro ao cadastrar pergunta. Tente novamente.', 'erro');
+        console.error('Erro ao salvar pergunta:', error);
+        mostrarMensagem('Erro ao salvar pergunta. Tente novamente.', 'erro');
     }
 }
 
@@ -402,6 +424,34 @@ function preencherProximaOrdem() {
         ordemInput.value = proximaOrdem;
         ordemInput.focus();
         mostrarMensagem(`Ordem ${proximaOrdem} preenchida automaticamente`, 'info');
+    }
+}
+
+// Função para resetar formulário de cadastro
+function resetarFormularioCadastroPergunta() {
+    // Restaurar título da seção
+    const headerTitulo = document.querySelector('.new-pergunta-header h2');
+    if (headerTitulo) {
+        headerTitulo.textContent = 'Nova pergunta';
+    }
+    
+    const headerDescricao = document.querySelector('.new-pergunta-header p');
+    if (headerDescricao) {
+        headerDescricao.textContent = 'Adicione uma nova pergunta';
+    }
+    
+    // Restaurar botão de cadastrar
+    const btnCadastrar = document.querySelector('.btn-primary');
+    if (btnCadastrar) {
+        btnCadastrar.textContent = 'Cadastrar';
+        btnCadastrar.removeAttribute('data-editing');
+    }
+    
+    // Restaurar botão cancelar
+    const btnCancelar = document.querySelector('.btn-secondary');
+    if (btnCancelar) {
+        btnCancelar.textContent = 'Cancelar';
+        btnCancelar.removeAttribute('data-editing');
     }
 }
 

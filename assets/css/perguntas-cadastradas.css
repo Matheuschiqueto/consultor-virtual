@@ -138,6 +138,22 @@
     margin-top: 15px;
 }
 
+.btn-edit {
+    background: #3498db;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.btn-edit:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
 .btn-delete {
     background: #e74c3c;
     color: white;
