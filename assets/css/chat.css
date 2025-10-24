@@ -14,10 +14,12 @@
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  min-height: calc(100vh - 200px);
+  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: hidden;
 }
 
 /* Container de mensagens */
@@ -26,6 +28,8 @@
   overflow-y: auto;
   padding: 20px 0;
   margin-bottom: 20px;
+  max-height: calc(100vh - 300px);
+  min-height: 400px;
 }
 
 /* Mensagem de Chat */
@@ -298,7 +302,13 @@
 @media (max-width: 768px) {
   .chat-container {
     padding: 20px;
-    min-height: calc(100vh - 150px);
+    height: calc(100vh - 150px);
+    max-height: calc(100vh - 150px);
+  }
+  
+  .messages-container {
+    max-height: calc(100vh - 250px);
+    min-height: 300px;
   }
 
   .option-buttons:not(.vertical) {
@@ -338,7 +348,13 @@
 @media (max-width: 480px) {
   .chat-container {
     padding: 15px;
-    min-height: calc(100vh - 120px);
+    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
+  }
+  
+  .messages-container {
+    max-height: calc(100vh - 200px);
+    min-height: 250px;
   }
 
   .chat-message {
