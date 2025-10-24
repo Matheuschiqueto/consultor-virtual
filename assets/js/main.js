@@ -48,10 +48,74 @@ navLinks.forEach(link => {
                 initListaProdutos();
             }
             
-            // Carregar produtos recentes se estiver na página de cadastro
+            // Carregar perguntas se estivermos na página de perguntas
+            if (page === 'cadastro-perguntas') {
+                console.log('🔄 Main.js: Carregando página de perguntas...');
+                setTimeout(() => {
+                    // Verificar se as funções existem antes de chamar
+                    if (typeof configurarEventos === 'function') {
+                        console.log('✅ Main.js: Chamando configurarEventos()');
+                        configurarEventos();
+                    }
+                    if (typeof atualizarInterfaceTipo === 'function') {
+                        console.log('✅ Main.js: Chamando atualizarInterfaceTipo()');
+                        atualizarInterfaceTipo();
+                    }
+                    if (typeof carregarPerguntas === 'function') {
+                        console.log('✅ Main.js: Chamando carregarPerguntas()');
+                        console.log('🔍 Main.js: Função carregarPerguntas existe:', typeof carregarPerguntas);
+                        console.log('🔍 Main.js: Função carregarPerguntas:', carregarPerguntas.toString().substring(0, 100));
+                        
+                        try {
+                            console.log('🔄 Main.js: ANTES de chamar carregarPerguntas()');
+                            const resultado = carregarPerguntas();
+                            console.log('🔄 Main.js: DEPOIS de chamar carregarPerguntas(), resultado:', resultado);
+                            console.log('✅ Main.js: carregarPerguntas() chamada com sucesso');
+                        } catch (error) {
+                            console.error('❌ Main.js: Erro ao chamar carregarPerguntas():', error);
+                            console.error('❌ Main.js: Stack trace:', error.stack);
+                        }
+                    } else {
+                        console.error('❌ Main.js: Função carregarPerguntas não encontrada');
+                    }
+                    
+                    // Teste adicional após 1 segundo
+                    setTimeout(() => {
+                        console.log('🧪 Main.js: Teste adicional após 1 segundo...');
+                        if (typeof testeExibicaoPerguntas === 'function') {
+                            testeExibicaoPerguntas();
+                        }
+                        
+                        // Teste com função simples
+                        if (typeof carregarPerguntasSimples === 'function') {
+                            console.log('🧪 Main.js: Testando função simples...');
+                            carregarPerguntasSimples();
+                        }
+                    }, 1000);
+                }, 300);
+            }
+            
+            // Carregar lista de perguntas se estivermos na página de perguntas cadastradas
+            if (page === 'perguntas-cadastradas') {
+                console.log('🔄 Main.js: Carregando página de perguntas cadastradas...');
+                setTimeout(() => {
+                    if (typeof initListaPerguntas === 'function') {
+                        console.log('✅ Main.js: Chamando initListaPerguntas()');
+                        initListaPerguntas();
+                    } else {
+                        console.error('❌ Main.js: Função initListaPerguntas não encontrada');
+                    }
+                }, 300);
+            }
+            
+            // Carregar produtos recentes se estiver na página de cadastro de produtos
             setTimeout(() => {
                 if (document.querySelector('.recent-section') && typeof atualizarProdutosRecentes === 'function') {
-                    atualizarProdutosRecentes();
+                    // Só atualizar se estivermos na página de produtos
+                    const isProdutosPage = document.querySelector('#formCadastroProduto') || document.querySelector('.product-list');
+                    if (isProdutosPage) {
+                        atualizarProdutosRecentes();
+                    }
                 }
             }, 100);
             

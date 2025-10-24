@@ -150,6 +150,13 @@ async function atualizarProdutosRecentes() {
         return;
     }
     
+    // Verificar se estamos na página de cadastro de produtos
+    const isProdutosPage = document.querySelector('#formCadastroProduto') || document.querySelector('.product-list');
+    if (!isProdutosPage) {
+        console.log('Não estamos na página de produtos, ignorando atualização');
+        return;
+    }
+    
     try {
         const response = await fetch(`${API_URL}/produtos`);
         

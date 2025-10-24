@@ -29,8 +29,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Arquivo TXT para armazenar produtos
+// Arquivos TXT para armazenar dados
 const PRODUTOS_FILE = path.join(__dirname, 'data', 'produtos.txt');
+const PERGUNTAS_FILE = path.join(__dirname, 'data', 'perguntas.txt');
 const DATA_DIR = path.join(__dirname, 'data');
 
 // Criar diretório data se não existir
@@ -38,9 +39,13 @@ if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Criar arquivo produtos.txt se não existir
+// Criar arquivos de dados se não existirem
 if (!fs.existsSync(PRODUTOS_FILE)) {
     fs.writeFileSync(PRODUTOS_FILE, '', 'utf8');
+}
+
+if (!fs.existsSync(PERGUNTAS_FILE)) {
+    fs.writeFileSync(PERGUNTAS_FILE, '', 'utf8');
 }
 
 // Função para ler produtos do arquivo TXT
@@ -79,6 +84,47 @@ function salvarProdutos(produtos) {
         return true;
     } catch (error) {
         console.error('Erro ao salvar produtos:', error);
+        return false;
+    }
+}
+
+// Função para ler perguntas do arquivo TXT
+function lerPerguntas() {
+    try {
+        const data = fs.readFileSync(PERGUNTAS_FILE, 'utf8');
+        if (!data.trim()) {
+            return [];
+        }
+        
+        const linhas = data.trim().split('\n');
+        const perguntas = linhas.map(linha => {
+            const [id, pergunta, tipo, ordem, opcoes, dataCadastro] = linha.split('|');
+            return {
+                id: parseInt(id),
+                pergunta: pergunta || '',
+                tipo: tipo || 'multipla-escolha',
+                ordem: parseInt(ordem) || 1,
+                opcoes: opcoes ? JSON.parse(opcoes) : [],
+                dataCadastro: dataCadastro || new Date().toISOString()
+            };
+        });
+        return perguntas;
+    } catch (error) {
+        console.error('Erro ao ler perguntas:', error);
+        return [];
+    }
+}
+
+// Função para salvar perguntas no arquivo TXT
+function salvarPerguntas(perguntas) {
+    try {
+        const linhas = perguntas.map(p => 
+            `${p.id}|${p.pergunta}|${p.tipo}|${p.ordem}|${JSON.stringify(p.opcoes)}|${p.dataCadastro}`
+        );
+        fs.writeFileSync(PERGUNTAS_FILE, linhas.join('\n'), 'utf8');
+        return true;
+    } catch (error) {
+        console.error('Erro ao salvar perguntas:', error);
         return false;
     }
 }
@@ -260,12 +306,204 @@ app.delete('/api/produtos/:id', (req, res) => {
     }
 });
 
+// ===== ROTAS DA API PARA PERGUNTAS =====
+
+// GET - Listar todas as perguntas
+app.get('/api/perguntas', (req, res) => {
+    try {
+        const perguntas = lerPerguntas();
+        res.json({
+            success: true,
+            total: perguntas.length,
+            perguntas: perguntas
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao listar perguntas',
+            error: error.message
+        });
+    }
+});
+
+// GET - Buscar pergunta por ID
+app.get('/api/perguntas/:id', (req, res) => {
+    try {
+        const perguntas = lerPerguntas();
+        const pergunta = perguntas.find(p => p.id === parseInt(req.params.id));
+        
+        if (pergunta) {
+            res.json({
+                success: true,
+                pergunta: pergunta
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                message: 'Pergunta não encontrada'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao buscar pergunta',
+            error: error.message
+        });
+    }
+});
+
+// POST - Criar nova pergunta
+app.post('/api/perguntas', (req, res) => {
+    try {
+        console.log('📝 Recebendo requisição de cadastro de pergunta...');
+        console.log('📋 Dados recebidos:', req.body);
+        
+        const perguntas = lerPerguntas();
+        
+        // Verificar se a ordem já existe
+        const ordemExistente = perguntas.find(p => p.ordem === parseInt(req.body.ordem));
+        if (ordemExistente) {
+            return res.status(400).json({
+                success: false,
+                message: `A ordem ${req.body.ordem} já está sendo usada pela pergunta: "${ordemExistente.pergunta}". Escolha uma ordem diferente.`
+            });
+        }
+        
+        // Gerar novo ID
+        const novoId = perguntas.length > 0 
+            ? Math.max(...perguntas.map(p => p.id)) + 1 
+            : 1;
+        
+        const novaPergunta = {
+            id: novoId,
+            pergunta: req.body.pergunta || '',
+            tipo: req.body.tipo || 'multipla-escolha',
+            ordem: parseInt(req.body.ordem) || 1,
+            opcoes: req.body.opcoes || [],
+            dataCadastro: new Date().toISOString()
+        };
+        
+        perguntas.push(novaPergunta);
+        
+        if (salvarPerguntas(perguntas)) {
+            console.log('✅ Pergunta cadastrada com sucesso! ID:', novoId);
+            res.status(201).json({
+                success: true,
+                message: 'Pergunta cadastrada com sucesso',
+                pergunta: novaPergunta
+            });
+        } else {
+            console.error('❌ Erro ao salvar pergunta no arquivo');
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao salvar pergunta'
+            });
+        }
+    } catch (error) {
+        console.error('❌ Erro ao criar pergunta:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao criar pergunta',
+            error: error.message
+        });
+    }
+});
+
+// PUT - Atualizar pergunta
+app.put('/api/perguntas/:id', (req, res) => {
+    try {
+        const perguntas = lerPerguntas();
+        const index = perguntas.findIndex(p => p.id === parseInt(req.params.id));
+        
+        if (index === -1) {
+            return res.status(404).json({
+                success: false,
+                message: 'Pergunta não encontrada'
+            });
+        }
+        
+        // Verificar se a nova ordem já existe (exceto para a própria pergunta)
+        if (req.body.ordem) {
+            const novaOrdem = parseInt(req.body.ordem);
+            const ordemExistente = perguntas.find(p => p.ordem === novaOrdem && p.id !== parseInt(req.params.id));
+            if (ordemExistente) {
+                return res.status(400).json({
+                    success: false,
+                    message: `A ordem ${novaOrdem} já está sendo usada pela pergunta: "${ordemExistente.pergunta}". Escolha uma ordem diferente.`
+                });
+            }
+        }
+        
+        // Atualizar campos
+        perguntas[index].pergunta = req.body.pergunta || perguntas[index].pergunta;
+        perguntas[index].tipo = req.body.tipo || perguntas[index].tipo;
+        perguntas[index].ordem = parseInt(req.body.ordem) || perguntas[index].ordem;
+        perguntas[index].opcoes = req.body.opcoes || perguntas[index].opcoes;
+        
+        if (salvarPerguntas(perguntas)) {
+            res.json({
+                success: true,
+                message: 'Pergunta atualizada com sucesso',
+                pergunta: perguntas[index]
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao atualizar pergunta'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao atualizar pergunta',
+            error: error.message
+        });
+    }
+});
+
+// DELETE - Excluir pergunta
+app.delete('/api/perguntas/:id', (req, res) => {
+    try {
+        const perguntas = lerPerguntas();
+        const index = perguntas.findIndex(p => p.id === parseInt(req.params.id));
+        
+        if (index === -1) {
+            return res.status(404).json({
+                success: false,
+                message: 'Pergunta não encontrada'
+            });
+        }
+        
+        const perguntaRemovida = perguntas.splice(index, 1)[0];
+        
+        if (salvarPerguntas(perguntas)) {
+            res.json({
+                success: true,
+                message: 'Pergunta excluída com sucesso',
+                pergunta: perguntaRemovida
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao excluir pergunta'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao excluir pergunta',
+            error: error.message
+        });
+    }
+});
+
 // Servir imagens da pasta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    console.log(`📁 Arquivo de dados: ${PRODUTOS_FILE}`);
+    console.log(`📁 Arquivo de produtos: ${PRODUTOS_FILE}`);
+    console.log(`📁 Arquivo de perguntas: ${PERGUNTAS_FILE}`);
 });
 

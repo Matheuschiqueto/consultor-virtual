@@ -1,0 +1,223 @@
+/* Estilos para a página de perguntas cadastradas */
+.container-perguntas {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.main-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pergunta-summary h1 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-size: 2em;
+}
+
+.pergunta-summary p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 1.1em;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-report {
+    background: #3498db;
+    color: white;
+}
+
+.btn-report:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-new-pergunta {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-new-pergunta:hover {
+    background: #229954;
+    transform: translateY(-2px);
+}
+
+/* Lista de perguntas */
+.pergunta-list {
+    display: grid;
+    gap: 20px;
+}
+
+.pergunta-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+}
+
+.pergunta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pergunta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.pergunta-info h3 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    line-height: 1.4;
+}
+
+.pergunta-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.pergunta-tipo {
+    background: #e8f4fd;
+    color: #2980b9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.pergunta-ordem {
+    background: #f39c12;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.pergunta-opcoes {
+    margin: 15px 0;
+}
+
+.pergunta-opcoes h4 {
+    margin: 0 0 8px 0;
+    color: #34495e;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.opcoes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.opcao-tag {
+    background: #ecf0f1;
+    color: #2c3e50;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    border: 1px solid #bdc3c7;
+}
+
+.pergunta-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.pergunta-data {
+    color: #7f8c8d;
+    font-size: 0.85em;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ecf0f1;
+}
+
+/* Mensagem quando não há perguntas */
+.pergunta-list:empty::before {
+    content: "Nenhuma pergunta cadastrada ainda";
+    display: block;
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #bdc3c7;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .main-actions {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pergunta-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pergunta-meta {
+        flex-wrap: wrap;
+    }
+}

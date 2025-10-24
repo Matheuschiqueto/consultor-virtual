@@ -1,0 +1,72 @@
+<div class="content-header">
+    <h1>Cadastro de Perguntas</h1>
+    <div class="header-caf">CAF</div>
+</div>
+
+<div class="container">
+    <div class="form-section">
+        <div class="new-question-header">
+            <span class="icon-plus">+</span>
+            <div>
+                <h2>Nova pergunta</h2>
+                <p>Adicione uma nova pergunta para o fluxo do chatbot</p>
+            </div>
+        </div>
+
+        <form id="formCadastroPergunta">
+            <div class="form-group">
+                <label for="pergunta">Pergunta <span class="required">*</span></label>
+                <textarea id="pergunta" placeholder="Digite a pergunta que será feita ao usuário..." rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo">Tipo de Resposta <span class="required">*</span></label>
+                <select id="tipo" required>
+                    <option value="multipla-escolha">Múltipla Escolha</option>
+                    <option value="texto-livre">Texto Livre</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="opcoes-container">
+                <label>Opções de Resposta <span class="required" id="opcoes-required">*</span></label>
+                <div class="opcoes-list" id="opcoes-list">
+                    <div class="opcao-item">
+                        <input type="text" placeholder="Digite uma opção de resposta..." class="opcao-input">
+                        <button type="button" class="btn-remove-opcao" onclick="removerOpcao(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-opcao" onclick="adicionarOpcao()">
+                    <i class="fas fa-plus"></i> Adicionar Opção
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label for="ordem">Ordem no Fluxo <span class="required">*</span></label>
+                <div class="ordem-container">
+                    <input type="number" id="ordem" placeholder="1" min="1" required>
+                    <button type="button" class="btn-sugerir-ordem" onclick="preencherProximaOrdem()" title="Preencher com a próxima ordem disponível">
+                        <i class="fas fa-magic"></i> Sugerir
+                    </button>
+                </div>
+                <small class="form-help">Define a sequência em que a pergunta será apresentada no chatbot</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Cadastrar Pergunta</button>
+                <button type="button" class="btn btn-secondary" onclick="limparFormulario()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+    
+    <aside class="recent-section">
+        <h3>Perguntas do fluxo</h3>
+        <div id="perguntas-recentes">
+            <div style="text-align:center;padding:40px;color:#999;">
+                <p>❓ Nenhuma pergunta cadastrada ainda</p>
+                <p style="font-size:0.85em;">Cadastre perguntas para criar o fluxo do chatbot</p>
+            </div>
+        </div>
+    </aside>
+</div>

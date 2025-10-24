@@ -1,0 +1,324 @@
+/* Estilos específicos para a tela de cadastro de perguntas */
+
+/* Header da nova pergunta */
+.new-question-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #D03131 0%, #b82828 100%);
+    border-radius: 8px;
+    color: white;
+}
+
+.new-question-header .icon-plus {
+    font-size: 2.5em;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+.new-question-header h2 {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.new-question-header p {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+/* Container de opções */
+.opcoes-list {
+    margin-bottom: 15px;
+}
+
+.opcao-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.opcao-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    font-size: 0.95em;
+    outline: none;
+}
+
+.opcao-input:focus {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px rgba(208, 49, 49, 0.2);
+}
+
+.btn-remove-opcao {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+.btn-remove-opcao:hover {
+    background-color: #c82333;
+}
+
+.btn-add-opcao {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-add-opcao:hover {
+    background-color: #218838;
+}
+
+/* Estilos para diferentes tipos de pergunta */
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95em;
+    background-color: white;
+    cursor: pointer;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(208, 49, 49, 0.2);
+}
+
+/* Campos obrigatórios */
+.required {
+    color: #D03131;
+    font-weight: bold;
+}
+
+/* Validação de campos */
+.form-group input:invalid,
+.form-group textarea:invalid,
+.form-group select:invalid {
+    border-color: #D03131;
+    box-shadow: 0 0 0 2px rgba(208, 49, 49, 0.2);
+}
+
+.form-group input:valid,
+.form-group textarea:valid,
+.form-group select:valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+/* Container da ordem com botão */
+.ordem-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ordem-container input[type="number"] {
+    flex: 1;
+}
+
+.btn-sugerir-ordem {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.btn-sugerir-ordem:hover {
+    background-color: #138496;
+}
+
+.btn-sugerir-ordem i {
+    margin-right: 5px;
+}
+
+/* Campo de ordem */
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95em;
+}
+
+.form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(208, 49, 49, 0.2);
+}
+
+/* Checkbox para pergunta obrigatória - removido */
+
+/* Texto de ajuda */
+.form-help {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #666;
+    font-style: italic;
+}
+
+/* Seção de perguntas recentes */
+.recent-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.recent-section h3 {
+    color: var(--color-text-dark);
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Cards de perguntas - versão compacta */
+.pergunta-card {
+    background-color: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.3s;
+}
+
+.pergunta-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pergunta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.pergunta-header h4 {
+    color: var(--color-primary);
+    margin: 0;
+    font-size: 0.9em;
+    font-weight: 600;
+    line-height: 1.3;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.pergunta-ordem {
+    background-color: #f39c12;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.pergunta-info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.8em;
+}
+
+.pergunta-tipo {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75em;
+}
+
+.pergunta-opcoes-count {
+    color: #666;
+    font-size: 0.75em;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .new-question-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .new-question-header .icon-plus {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .opcao-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-remove-opcao {
+        margin-left: 0;
+        margin-top: 10px;
+        align-self: flex-end;
+    }
+    
+    .pergunta-card .pergunta-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+/* Animações */
+.opcao-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.pergunta-card {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
