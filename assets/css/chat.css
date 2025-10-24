@@ -110,7 +110,7 @@
   padding: 10px 20px;
   border-radius: 20px; /* Borda bem arredondada para botões de opção */
   border: 2px solid var(--color-primary);
-  background-color: white;
+  background-color: #f8f9fa;
   color: var(--color-primary);
   font-weight: bold;
   cursor: pointer;
@@ -121,15 +121,16 @@
 }
 
 .btn-option:hover {
-  background-color: var(--color-red-light);
+  background-color: #e9ecef;
   transform: translateY(-1px);
 }
 
 /* Estilo para opções selecionadas */
 .btn-option.selected {
-  background-color: var(--color-red-light);
-  color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: white;
   border-color: var(--color-primary);
+  transform: scale(1.05);
 }
 
 /* Estilo para opções ativas (preenchidas) */
@@ -150,6 +151,32 @@
   color: white;
   border-color: var(--color-primary);
   transform: scale(1.05);
+}
+
+/* Estilo para botões desabilitados */
+.btn-option:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-option:disabled:hover {
+  transform: none;
+}
+
+/* Estilo para botões desabilitados mas selecionados */
+.btn-option:disabled.selected {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  opacity: 0.8;
+}
+
+.btn-option:disabled.selected:hover {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  transform: none;
 }
 
 /* Mensagem final */

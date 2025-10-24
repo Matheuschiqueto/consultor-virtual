@@ -144,6 +144,13 @@ function configurarBotoesOpcoes(messageDiv, opcoes) {
             botoes.forEach(b => b.classList.remove('selected'));
             botao.classList.add('selected');
             
+            // Desabilitar todos os botões após seleção
+            botoes.forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.6';
+                b.style.cursor = 'not-allowed';
+            });
+            
             // Processar resposta
             setTimeout(() => {
                 processarRespostaOpcao(opcaoSelecionada);
