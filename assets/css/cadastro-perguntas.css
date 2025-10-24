@@ -1,31 +1,30 @@
 /* Estilos específicos para a tela de cadastro de perguntas */
 
-/* Header da nova pergunta */
-.new-question-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: linear-gradient(135deg, #D03131 0%, #b82828 100%);
-    border-radius: 8px;
-    color: white;
+/* Header da nova pergunta - seguindo o padrão do cadastro de produtos */
+.new-pergunta-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30px;
 }
 
-.new-question-header .icon-plus {
-    font-size: 2.5em;
-    margin-right: 20px;
-    font-weight: bold;
+.new-pergunta-header h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-.new-question-header h2 {
-    font-size: 1.5em;
-    margin-bottom: 5px;
-    font-weight: bold;
+.new-pergunta-header p {
+  color: var(--color-text-light);
+  font-size: 0.9em;
+  margin: 0;
 }
 
-.new-question-header p {
-    font-size: 0.9em;
-    opacity: 0.9;
+.icon-plus {
+  font-size: 2.2em;
+  font-weight: bold;
+  margin-right: 15px;
+  line-height: 1;
+  color: var(--color-text-dark);
 }
 
 /* Container de opções */
@@ -264,15 +263,13 @@
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .new-question-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .new-question-header .icon-plus {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
+  .new-pergunta-header {
+    flex-direction: column;
+  }
+  
+  .icon-plus {
+    margin-bottom: 10px;
+  }
     
     .opcao-item {
         flex-direction: column;
