@@ -209,6 +209,9 @@ function exibirMensagemOrientacao(pergunta) {
     const messagesContainer = document.querySelector('.messages-container');
     if (!messagesContainer) return;
     
+    // Desabilitar botões da pergunta original
+    desabilitarBotoesPerguntaAnterior();
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = 'chat-message bot-message orientacao-message';
     messageDiv.innerHTML = `
@@ -226,6 +229,21 @@ function exibirMensagemOrientacao(pergunta) {
     configurarBotoesOpcoes(messageDiv, pergunta.opcoes);
     
     messageDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Desabilitar botões da pergunta anterior
+function desabilitarBotoesPerguntaAnterior() {
+    const messagesContainer = document.querySelector('.messages-container');
+    if (!messagesContainer) return;
+    
+    // Encontrar todos os botões de opção que não estão desabilitados
+    const todosBotoes = messagesContainer.querySelectorAll('.btn-option:not(:disabled)');
+    
+    todosBotoes.forEach(botao => {
+        botao.disabled = true;
+        botao.style.opacity = '0.6';
+        botao.style.cursor = 'not-allowed';
+    });
 }
 
 // Exibir resposta do usuário
