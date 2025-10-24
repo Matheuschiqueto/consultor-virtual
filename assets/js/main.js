@@ -119,6 +119,19 @@ navLinks.forEach(link => {
                 }
             }, 100);
             
+            // Inicializar chat se estivermos na página de chat
+            if (page === 'chat') {
+                console.log('🤖 Main.js: Carregando página de chat...');
+                setTimeout(() => {
+                    if (typeof initChat === 'function') {
+                        console.log('✅ Main.js: Chamando initChat()');
+                        initChat();
+                    } else {
+                        console.error('❌ Main.js: Função initChat não encontrada');
+                    }
+                }, 300);
+            }
+            
         } catch (error) {
             console.error('Erro ao carregar a página:', error);
             pageContent.innerHTML = '<p>Erro ao carregar o conteúdo. Tente novamente.</p>';
