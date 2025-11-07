@@ -1,10 +1,10 @@
-1|Qual é o seu estilo preferido?|multipla-escolha|1|["Casual","Formal","Esportivo"]|2025-10-24T12:29:46.484Z
-2|Qual é a sua faixa etária?|multipla-escolha|2|["18-25","26-35","36-45","46-55","Acima de 55"]|2025-10-24T12:44:58.333Z
-3|Pergunta teste 1|multipla-escolha|3|["op 1","op 2"]|2025-10-24T12:50:00.107Z
-5|Teste ordem duplicada|multipla-escolha|1|["opcao1","opcao2"]|2025-10-24T12:52:15.457Z
-6|Teste ordem válida|multipla-escolha|5|["teste"]|2025-10-24T12:52:39.828Z
-7|teste 2|multipla-escolha|4|["op 1","op 2"]|2025-10-24T12:53:49.561Z
-8|Descreva suas necessidades específicas|texto-livre|7|[]|2025-10-24T12:55:25.102Z
-9|teste|texto-livre|6|[]|2025-10-24T12:56:08.613Z
-10|teste|texto-livre|8|[]|2025-10-24T12:56:27.853Z
-11|Qual sua cor preferida?|multipla-escolha|10|["Vermelha","Azul","Preta","Branca"]|2025-10-28T14:04:39.110Z
+1|Para qual finalidade pretende usar o moedor?|multipla-escolha|1|["Doméstico","Comercial","Industrial"]|2025-11-07T22:57:43.162Z
+2|Quantos quilos precisa moer por minuto?|multipla-escolha|2|["Até 1Kg","Até 6.5Kg","Até 9Kg","Acima de 10Kg"]|2025-11-07T22:59:17.305Z
+3|Qual é a voltagem que pretende utilizar?|multipla-escolha|3|["127V","220V","Trifásico"]|2025-11-07T22:59:53.876Z
+4|O que irá moer?|multipla-escolha|4|["Carne, Frango","Embutidos","Diversos (Castanhas, Frutas, Graõs, Etc)"]|2025-11-07T23:01:33.157Z
+5|Prefere modelo mais fácil de limpar?|multipla-escolha|5|["Sim","Não"]|2025-11-07T23:02:18.446Z
+6|Ruído é um fator importante?|multipla-escolha|6|["Sim","Não"]|2025-11-07T23:02:44.674Z
+7|O espaço físico é limitado?|multipla-escolha|7|["Sim","Não"]|2025-11-07T23:03:24.481Z
+8|Qual é a faixa de orçamento?|multipla-escolha|8|["Até R$ 2,500,00","Até R$ 15,000,00","Acima de R$ 15,000,00"]|2025-11-07T23:05:07.494Z
+9|Deseja função de remoagem?|multipla-escolha|9|["Sim","Não"]|2025-11-07T23:06:04.886Z
+10|Potência desejada|multipla-escolha|10|["Até 0,25kW","Até 2,2kW","Até 5,5kW","Até 7,5kW"]|2025-11-07T23:07:21.231Z
