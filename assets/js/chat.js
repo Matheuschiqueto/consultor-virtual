@@ -267,6 +267,14 @@ function exibirRespostaUsuario(resposta) {
     messageDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
+// Função auxiliar para escapar HTML (segurança)
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Exibir resumo final
 async function exibirResumoFinal() {
     const messagesContainer = document.querySelector('.messages-container');
@@ -302,6 +310,10 @@ async function exibirResumoFinal() {
         
         const resultado = await response.json();
         
+        // Debug: verificar o que foi retornado
+        console.log('📊 Resultado da API:', resultado);
+        console.log('📋 Regras recebidas:', resultado.regras);
+        
         // Remover mensagem de carregamento
         loadingDiv.remove();
         
@@ -324,39 +336,87 @@ async function exibirResumoFinal() {
             // Exibir resumo com recomendação
             const messageDiv = document.createElement('div');
             messageDiv.className = 'chat-message bot-message final-message';
+            
+            // Formatar descrição do produto
+            const descricaoFormatada = produtoInfo && produtoInfo.descricao 
+                ? produtoInfo.descricao.replace(/\\n/g, '\n').replace(/\n\n+/g, '\n').trim()
+                : '';
+            
             messageDiv.innerHTML = `
                 <div class="bot-icon">🤖</div>
                 <div class="message-content">
                     <div class="cabecalho-recomendacao">
-                        <h2>✨ Recomendação Personalizada</h2>
-                        <p class="subtitulo-recomendacao">Com base nas suas respostas, nossa IA recomenda:</p>
+                        <div class="badge-recomendacao">Recomendação Personalizada</div>
+                        <h2>Máquina Recomendada</h2>
+                        <p class="subtitulo-recomendacao">Com base na análise das suas necessidades, nossa inteligência artificial identificou a solução ideal para você.</p>
                     </div>
                     
                     <div class="recomendacao-produto">
-                        <div class="produto-destaque">
-                            <div class="icone-produto">🎯</div>
-                            <h3>${resultado.produto}</h3>
-                            ${produtoInfo ? `
-                                <div class="produto-info">
-                                    ${produtoInfo.imagem ? `<img src="${produtoInfo.imagem}" alt="${produtoInfo.nome}" class="produto-imagem">` : ''}
-                                    ${produtoInfo.descricao ? `<p class="produto-descricao">${produtoInfo.descricao.replace(/\\n/g, ' ').replace(/\s+/g, ' ').substring(0, 250)}${produtoInfo.descricao.length > 250 ? '...' : ''}</p>` : ''}
-                                </div>
-                            ` : ''}
+                        <div class="produto-header">
+                            <div class="produto-titulo-wrapper">
+                                <h3 class="produto-nome">${escapeHtml(resultado.produto)}</h3>
+                                <span class="badge-ia">Recomendado por IA</span>
+                            </div>
                         </div>
+                        
+                        ${produtoInfo ? `
+                            <div class="produto-detalhes">
+                                ${produtoInfo.imagem ? `
+                                    <div class="produto-imagem-wrapper">
+                                        <img src="${escapeHtml(produtoInfo.imagem)}" alt="${escapeHtml(produtoInfo.nome)}" class="produto-imagem">
+                                    </div>
+                                ` : ''}
+                                
+                                ${descricaoFormatada ? `
+                                    <div class="produto-descricao-wrapper">
+                                        <h4 class="descricao-titulo">Sobre o Produto</h4>
+                                        <p class="produto-descricao">${escapeHtml(descricaoFormatada)}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : `
+                            <div class="produto-sem-info">
+                                <p>Informações detalhadas sobre este produto estarão disponíveis em breve.</p>
+                            </div>
+                        `}
                     </div>
                     
-                    <div class="resumo-respostas">
-                        <h4>📋 Resumo das suas respostas:</h4>
-                        <ul>
-                            ${Object.entries(respostasUsuario).map(([perguntaId, resposta]) => {
-                                const pergunta = perguntasChat.find(p => p.id == perguntaId);
-                                return `<li><strong>${pergunta?.pergunta}:</strong> ${resposta}</li>`;
-                            }).join('')}
-                        </ul>
-                    </div>
+                    ${resultado.regras && Array.isArray(resultado.regras) && resultado.regras.length > 0 ? `
+                        <div class="regras-decisao">
+                            <div class="regras-header">
+                                <h4>🎯 Por que esta máquina foi escolhida?</h4>
+                                <p class="regras-subtitulo">As seguintes características foram determinantes na recomendação:</p>
+                            </div>
+                            <div class="regras-lista">
+                                ${resultado.regras.map((regra, index) => `
+                                    <div class="regra-item ${regra.importancia === 'alta' ? 'regra-alta' : ''}">
+                                        <div class="regra-numero">${index + 1}</div>
+                                        <div class="regra-conteudo">
+                                            <div class="regra-pergunta">
+                                                <span class="regra-icon">${regra.importancia === 'alta' ? '⭐' : '✓'}</span>
+                                                <span class="regra-texto">${escapeHtml(regra.pergunta)}</span>
+                                                ${regra.importancia === 'alta' ? '<span class="badge-importancia">Determinante</span>' : ''}
+                                            </div>
+                                            <div class="regra-resposta">${escapeHtml(regra.resposta)}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="regras-decisao" style="background: #fff3cd; border-color: #ffc107;">
+                            <div class="regras-header">
+                                <h4>ℹ️ Informação sobre a Recomendação</h4>
+                                <p class="regras-subtitulo">As regras de decisão não estão disponíveis no momento.</p>
+                            </div>
+                        </div>
+                    `}
                     
                     <div class="acoes-finais">
-                        <button class="btn btn-primary" onclick="reiniciarChat()">🔄 Nova Consulta</button>
+                        <button class="btn btn-primary btn-nova-consulta" onclick="reiniciarChat()">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Nova Consulta</span>
+                        </button>
                     </div>
                 </div>
             `;
@@ -392,19 +452,20 @@ function exibirResumoComErro(mensagemErro) {
     messageDiv.innerHTML = `
         <div class="bot-icon">🤖</div>
         <div class="message-content">
-            <p><strong>Obrigado pelas suas respostas!</strong></p>
-            <p class="error-text">⚠️ ${mensagemErro}</p>
-            <p>Com base nas suas respostas, podemos recomendar os produtos mais adequados para você.</p>
-            <div class="resumo-respostas">
-                <h4>Resumo das suas respostas:</h4>
-                <ul>
-                    ${Object.entries(respostasUsuario).map(([perguntaId, resposta]) => {
-                        const pergunta = perguntasChat.find(p => p.id == perguntaId);
-                        return `<li><strong>${pergunta?.pergunta}:</strong> ${resposta}</li>`;
-                    }).join('')}
-                </ul>
+            <div class="cabecalho-recomendacao">
+                <h2>Obrigado pela sua Consulta</h2>
             </div>
-            <button class="btn btn-primary" onclick="reiniciarChat()">Nova Consulta</button>
+            <div class="error-notification">
+                <span class="error-icon">⚠️</span>
+                <p class="error-message">${mensagemErro}</p>
+            </div>
+            <p class="mensagem-fallback">Com base nas suas respostas, podemos recomendar os produtos mais adequados para você. Entre em contato conosco para obter uma recomendação personalizada.</p>
+            <div class="acoes-finais">
+                <button class="btn btn-primary btn-nova-consulta" onclick="reiniciarChat()">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">Nova Consulta</span>
+                </button>
+            </div>
         </div>
     `;
     

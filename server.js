@@ -598,6 +598,7 @@ app.post('/api/recomendar-produto', async (req, res) => {
                     response.on('end', () => {
                         try {
                             const resultado = JSON.parse(data);
+                            console.log('📊 Resultado do serviço Python:', JSON.stringify(resultado, null, 2));
                             resolve(resultado);
                         } catch (e) {
                             reject(new Error(`Erro ao parsear resposta: ${e.message}`));
@@ -617,6 +618,7 @@ app.post('/api/recomendar-produto', async (req, res) => {
                 res.json({
                     success: true,
                     produto: resultado.produto,
+                    regras: resultado.regras || [],
                     respostas: respostasFormatadas
                 });
             } else {
