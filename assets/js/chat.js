@@ -166,6 +166,9 @@ function processarRespostaOpcao(resposta) {
     
     console.log(`✅ Resposta registrada para pergunta ${pergunta.id}:`, resposta);
     
+    // Exibir a resposta do usuário como mensagem
+    exibirRespostaUsuario(resposta);
+    
     perguntaAtual++;
     setTimeout(() => {
         exibirProximaPergunta();
