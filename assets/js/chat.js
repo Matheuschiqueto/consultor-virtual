@@ -268,7 +268,122 @@ function exibirRespostaUsuario(resposta) {
 }
 
 // Exibir resumo final
-function exibirResumoFinal() {
+async function exibirResumoFinal() {
+    const messagesContainer = document.querySelector('.messages-container');
+    if (!messagesContainer) return;
+    
+    // Mostrar mensagem de carregamento
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'chat-message bot-message loading-message';
+    loadingDiv.innerHTML = `
+        <div class="bot-icon">🤖</div>
+        <div class="message-content">
+            <p><strong>Processando suas respostas...</strong></p>
+            <p>Estamos analisando suas necessidades para recomendar a melhor máquina para você.</p>
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    `;
+    messagesContainer.appendChild(loadingDiv);
+    loadingDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    // Chamar API para obter recomendação
+    try {
+        const response = await fetch('/api/recomendar-produto', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                respostas: respostasUsuario
+            })
+        });
+        
+        const resultado = await response.json();
+        
+        // Remover mensagem de carregamento
+        loadingDiv.remove();
+        
+        if (resultado.success) {
+            // Buscar informações do produto recomendado
+            let produtoInfo = null;
+            try {
+                const produtosResponse = await fetch('/api/produtos');
+                const produtosData = await produtosResponse.json();
+                if (produtosData.success) {
+                    produtoInfo = produtosData.produtos.find(p => 
+                        p.nome.toLowerCase().includes(resultado.produto.toLowerCase()) ||
+                        resultado.produto.toLowerCase().includes(p.nome.toLowerCase())
+                    );
+                }
+            } catch (error) {
+                console.log('Não foi possível buscar informações do produto:', error);
+            }
+            
+            // Exibir resumo com recomendação
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message bot-message final-message';
+            messageDiv.innerHTML = `
+                <div class="bot-icon">🤖</div>
+                <div class="message-content">
+                    <div class="cabecalho-recomendacao">
+                        <h2>✨ Recomendação Personalizada</h2>
+                        <p class="subtitulo-recomendacao">Com base nas suas respostas, nossa IA recomenda:</p>
+                    </div>
+                    
+                    <div class="recomendacao-produto">
+                        <div class="produto-destaque">
+                            <div class="icone-produto">🎯</div>
+                            <h3>${resultado.produto}</h3>
+                            ${produtoInfo ? `
+                                <div class="produto-info">
+                                    ${produtoInfo.imagem ? `<img src="${produtoInfo.imagem}" alt="${produtoInfo.nome}" class="produto-imagem">` : ''}
+                                    ${produtoInfo.descricao ? `<p class="produto-descricao">${produtoInfo.descricao.replace(/\\n/g, ' ').replace(/\s+/g, ' ').substring(0, 250)}${produtoInfo.descricao.length > 250 ? '...' : ''}</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="resumo-respostas">
+                        <h4>📋 Resumo das suas respostas:</h4>
+                        <ul>
+                            ${Object.entries(respostasUsuario).map(([perguntaId, resposta]) => {
+                                const pergunta = perguntasChat.find(p => p.id == perguntaId);
+                                return `<li><strong>${pergunta?.pergunta}:</strong> ${resposta}</li>`;
+                            }).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="acoes-finais">
+                        <button class="btn btn-primary" onclick="reiniciarChat()">🔄 Nova Consulta</button>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // Exibir erro mas ainda mostrar resumo
+            exibirResumoComErro(resultado.message);
+        }
+    } catch (error) {
+        console.error('❌ Erro ao obter recomendação:', error);
+        // Remover mensagem de carregamento
+        loadingDiv.remove();
+        // Exibir resumo sem recomendação
+        exibirResumoComErro('Não foi possível obter a recomendação da IA. Verifique se o serviço está rodando.');
+    }
+    
+    // Esconder input
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.style.display = 'none';
+    }
+}
+
+// Exibir resumo com erro (fallback)
+function exibirResumoComErro(mensagemErro) {
     const messagesContainer = document.querySelector('.messages-container');
     if (!messagesContainer) return;
     
@@ -278,6 +393,7 @@ function exibirResumoFinal() {
         <div class="bot-icon">🤖</div>
         <div class="message-content">
             <p><strong>Obrigado pelas suas respostas!</strong></p>
+            <p class="error-text">⚠️ ${mensagemErro}</p>
             <p>Com base nas suas respostas, podemos recomendar os produtos mais adequados para você.</p>
             <div class="resumo-respostas">
                 <h4>Resumo das suas respostas:</h4>
@@ -293,13 +409,6 @@ function exibirResumoFinal() {
     `;
     
     messagesContainer.appendChild(messageDiv);
-    
-    // Esconder input
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-        chatInput.style.display = 'none';
-    }
-    
     messageDiv.scrollIntoView({ behavior: 'smooth' });
 }
 

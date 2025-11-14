@@ -497,6 +497,153 @@ app.delete('/api/perguntas/:id', (req, res) => {
     }
 });
 
+// ===== ROTAS DA API PARA IA/PREDIÇÃO =====
+
+// POST - Obter recomendação de produto baseado nas respostas
+app.post('/api/recomendar-produto', async (req, res) => {
+    try {
+        const respostas = req.body.respostas; // { perguntaId: resposta, ... }
+        
+        if (!respostas || typeof respostas !== 'object') {
+            return res.status(400).json({
+                success: false,
+                message: 'Respostas não fornecidas ou formato inválido'
+            });
+        }
+        
+        // Carregar perguntas para mapear IDs para textos
+        const perguntas = lerPerguntas();
+        
+        // Mapear respostas do formato do chat para o formato esperado pela IA
+        const respostasFormatadas = {};
+        
+        // Criar um mapa de perguntas por ordem
+        const perguntasPorOrdem = {};
+        perguntas.forEach(p => {
+            perguntasPorOrdem[p.ordem] = p;
+        });
+        
+        // Mapear cada resposta
+        Object.keys(respostas).forEach(perguntaId => {
+            const pergunta = perguntas.find(p => p.id == perguntaId);
+            if (pergunta) {
+                respostasFormatadas[pergunta.pergunta] = respostas[perguntaId];
+            }
+        });
+        
+        // Verificar se todas as perguntas foram respondidas
+        const perguntasObrigatorias = [
+            'Para qual finalidade pretende usar o moedor?',
+            'Quantos quilos precisa moer por minuto?',
+            'Qual é a voltagem que pretende utilizar?',
+            'O que irá moer?',
+            'Prefere modelo mais fácil de limpar?',
+            'Ruído é um fator importante?',
+            'O espaço físico é limitado?',
+            'Qual é a faixa de orçamento?',
+            'Deseja função de remoagem?',
+            'Potência desejada'
+        ];
+        
+        const perguntasFaltando = perguntasObrigatorias.filter(
+            p => !respostasFormatadas[p]
+        );
+        
+        if (perguntasFaltando.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Nem todas as perguntas foram respondidas',
+                perguntasFaltando: perguntasFaltando
+            });
+        }
+        
+        // Preparar dados para enviar ao serviço Python
+        const dadosParaIA = {
+            finalidade: respostasFormatadas['Para qual finalidade pretende usar o moedor?'],
+            quantidade: respostasFormatadas['Quantos quilos precisa moer por minuto?'],
+            voltagem: respostasFormatadas['Qual é a voltagem que pretende utilizar?'],
+            tipo_material: respostasFormatadas['O que irá moer?'],
+            facil_limpeza: respostasFormatadas['Prefere modelo mais fácil de limpar?'],
+            ruido_importante: respostasFormatadas['Ruído é um fator importante?'],
+            espaco_limitado: respostasFormatadas['O espaço físico é limitado?'],
+            orcamento: respostasFormatadas['Qual é a faixa de orçamento?'],
+            remoagem: respostasFormatadas['Deseja função de remoagem?'],
+            potencia: respostasFormatadas['Potência desejada']
+        };
+        
+        // Chamar serviço Python via HTTP
+        const pythonServiceUrl = process.env.PYTHON_SERVICE_URL || 'http://localhost:5000';
+        
+        try {
+            // Usar http/https nativo do Node.js
+            const http = require('http');
+            const parsedUrl = new URL(`${pythonServiceUrl}/predict`);
+            const postData = JSON.stringify(dadosParaIA);
+            
+            const resultado = await new Promise((resolve, reject) => {
+                const options = {
+                    hostname: parsedUrl.hostname,
+                    port: parsedUrl.port || 5000,
+                    path: parsedUrl.pathname,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(postData)
+                    }
+                };
+                
+                const req = http.request(options, (response) => {
+                    let data = '';
+                    response.on('data', (chunk) => { data += chunk; });
+                    response.on('end', () => {
+                        try {
+                            const resultado = JSON.parse(data);
+                            resolve(resultado);
+                        } catch (e) {
+                            reject(new Error(`Erro ao parsear resposta: ${e.message}`));
+                        }
+                    });
+                });
+                
+                req.on('error', (error) => {
+                    reject(error);
+                });
+                
+                req.write(postData);
+                req.end();
+            });
+            
+            if (resultado.success) {
+                res.json({
+                    success: true,
+                    produto: resultado.produto,
+                    respostas: respostasFormatadas
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: resultado.message || 'Erro ao obter recomendação'
+                });
+            }
+        } catch (error) {
+            console.error('❌ Erro ao chamar serviço Python:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao conectar com o serviço de IA. Certifique-se de que o serviço Python está rodando.',
+                error: error.message
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao processar recomendação:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao processar recomendação',
+            error: error.message
+        });
+    }
+});
+
 // Servir imagens da pasta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -505,5 +652,6 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
     console.log(`📁 Arquivo de produtos: ${PRODUTOS_FILE}`);
     console.log(`📁 Arquivo de perguntas: ${PERGUNTAS_FILE}`);
+    console.log(`🤖 Serviço de IA esperado em: ${process.env.PYTHON_SERVICE_URL || 'http://localhost:5000'}`);
 });
 
