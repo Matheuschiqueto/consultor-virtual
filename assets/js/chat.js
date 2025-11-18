@@ -49,18 +49,53 @@ function limparChat() {
         messagesContainer.className = 'messages-container';
         chatContainer.appendChild(messagesContainer);
         
+        // Exibir mensagem inicial explicando o que o chat faz
+        exibirMensagemInicial(messagesContainer);
+        
         // Adicionar área de input
         const inputArea = document.createElement('div');
         inputArea.className = 'input-area';
         inputArea.innerHTML = `
             <input type="text" placeholder="Digite sua resposta..." id="chatInput" style="display: none;">
-            <button class="btn btn-primary" id="btnIniciarChat" style="display: block;">Iniciar Conversa</button>
+            <button class="btn btn-primary" id="btnIniciarChat" style="display: block;">Começar Agora</button>
         `;
         chatContainer.appendChild(inputArea);
         
         // Configurar eventos
         configurarEventosChat();
     }
+}
+
+// Exibir mensagem inicial explicando o que o chat faz
+function exibirMensagemInicial(messagesContainer) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message bot-message welcome-message';
+    messageDiv.innerHTML = `
+        <div class="bot-icon">🤖</div>
+        <div class="message-content">
+            <div class="welcome-header">
+                <h2>👋 Bem-vindo ao Consultor Virtual de Moedores!</h2>
+            </div>
+            <div class="welcome-body">
+                <p><strong>O que é este chat?</strong></p>
+                <p>Este é um assistente virtual inteligente que utiliza <strong>Inteligência Artificial</strong> para recomendar o moedor de carne ideal para suas necessidades.</p>
+                
+                <p><strong>Como funciona?</strong></p>
+                <ul class="welcome-list">
+                    <li>📋 Responda algumas perguntas sobre suas necessidades</li>
+                    <li>🤖 Nossa IA analisará suas respostas</li>
+                    <li>🎯 Você receberá uma recomendação personalizada</li>
+                    <li>💡 Entenda o motivo da recomendação com explicações detalhadas</li>
+                </ul>
+                
+                <p><strong>O que você precisa fazer?</strong></p>
+                <p>Clique no botão <strong>"Começar Agora"</strong> abaixo e responda as perguntas que aparecerem. É rápido e fácil!</p>
+            </div>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    messageDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Configurar eventos do chat
