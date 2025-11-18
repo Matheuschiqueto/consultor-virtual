@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitetura do Sistema - Chatbot com IA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --frontend-bg: #e1f5ff;
+            --frontend-border: #01579b;
+            --backend-bg: #fff3e0;
+            --backend-border: #e65100;
+            --ia-bg: #f3e5f5;
+            --ia-border: #4a148c;
+            --storage-bg: #e8f5e9;
+            --storage-border: #1b5e20;
+            --training-bg: #fce4ec;
+            --training-border: #880e4f;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --bg-light: #f8f9fa;
+            --shadow-sm: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.2);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2em;
+            font-weight: 500;
+            animation: slideDown 0.8s ease 0.2s backwards;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            background: white;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .diagram-container {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .diagram-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-button {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .svg-container {
+            overflow: auto;
+            border-radius: 10px;
+            background: white;
+            padding: 20px;
+        }
+
+        .component {
+            fill: white;
+            stroke: #333;
+            stroke-width: 2;
+            rx: 10;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        .component:hover {
+            stroke-width: 3;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+            transform: scale(1.03);
+        }
+
+        .component.active {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .frontend { fill: var(--frontend-bg); stroke: var(--frontend-border); }
+        .backend { fill: var(--backend-bg); stroke: var(--backend-border); }
+        .ia { fill: var(--ia-bg); stroke: var(--ia-border); }
+        .storage { fill: var(--storage-bg); stroke: var(--storage-border); }
+        .training { fill: var(--training-bg); stroke: var(--training-border); }
+
+        .text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            fill: var(--text-primary);
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .arrow {
+            stroke: #666;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+            transition: all 0.3s ease;
+        }
+
+        .arrow.animated {
+            animation: flowAnimation 2s ease-in-out infinite;
+            stroke-dasharray: 10;
+            stroke-dashoffset: 0;
+        }
+
+        @keyframes flowAnimation {
+            to {
+                stroke-dashoffset: -20;
+            }
+        }
+
+        .arrow-label {
+            font-size: 12px;
+            fill: var(--text-secondary);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .legend-item:hover {
+            background: var(--bg-light);
+            transform: translateY(-2px);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover .legend-color {
+            transform: rotate(180deg);
+        }
+
+        .flow-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: var(--bg-light);
+            border-radius: 15px;
+        }
+
+        .flow-title {
+            font-size: 2em;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .flow-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 25px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flow-step:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .flow-step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .flow-step strong {
+            color: var(--text-primary);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .flow-step p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-left: 55px;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .tech-badge:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .tech-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tech-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .endpoint-item {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-light);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-item:hover {
+            background: #e8ebff;
+            transform: translateX(8px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.85em;
+        }
+
+        .method-get {
+            background: #4caf50;
+            color: white;
+        }
+
+        .method-post {
+            background: #2196f3;
+            color: white;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .flow-step p {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-project-diagram"></i> Arquitetura do Sistema</h1>
+            <p class="subtitle">Sistema de Recomendação de Produtos com Inteligência Artificial</p>
+        </header>
+
+        <!-- Sistema de Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('diagram')">
+                <i class="fas fa-sitemap"></i> Diagrama
+            </button>
+            <button class="tab-button" onclick="switchTab('flow')">
+                <i class="fas fa-stream"></i> Fluxo
+            </button>
+            <button class="tab-button" onclick="switchTab('tech')">
+                <i class="fas fa-code"></i> Tecnologias
+            </button>
+            <button class="tab-button" onclick="switchTab('api')">
+                <i class="fas fa-plug"></i> API
+            </button>
+        </div>
+
+        <!-- Tab: Diagrama -->
+        <div id="diagram" class="tab-content active">
+            <div class="diagram-controls">
+                <button class="control-button" onclick="toggleAnimation()">
+                    <i class="fas fa-play"></i> Animar Fluxo
+                </button>
+                <button class="control-button" onclick="resetDiagram()">
+                    <i class="fas fa-redo"></i> Resetar
+                </button>
+            </div>
+
+            <div class="diagram-container">
+                <div class="svg-container">
+                    <svg width="100%" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" id="architecture-svg">
+                        <!-- Definições -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#666" />
+                            </marker>
+                            
+                            <!-- Gradientes -->
+                            <linearGradient id="grad-frontend" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e1f5ff;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#b3e5fc;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad-backend" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#fff3e0;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ffe0b2;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad-ia" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f3e5f5;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e1bee7;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad-storage" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e8f5e9;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#c8e6c9;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="grad-training" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#fce4ec;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#f8bbd0;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Frontend -->
+                        <g id="frontend" data-tooltip="Interface do usuário com HTML, CSS e JavaScript">
+                            <rect x="50" y="50" width="200" height="120" class="component frontend" style="fill: url(#grad-frontend);" />
+                            <text x="150" y="85" class="text">
+                                <tspan style="font-size: 16px;">🖥️ Frontend</tspan>
+                            </text>
+                            <text x="150" y="110" class="text" style="font-size: 12px;">HTML/CSS/JS</text>
+                            <text x="150" y="130" class="text" style="font-size: 11px;">Porta: Cliente</text>
+                            <text x="150" y="150" class="text" style="font-size: 11px;">Navegador</text>
+                        </g>
+
+                        <!-- Backend Node.js -->
+                        <g id="backend" data-tooltip="Servidor Node.js com Express, gerencia todas as rotas da API">
+                            <rect x="400" y="50" width="200" height="200" class="component backend" style="fill: url(#grad-backend);" />
+                            <text x="500" y="85" class="text">
+                                <tspan style="font-size: 16px;">⚙️ Backend</tspan>
+                            </text>
+                            <text x="500" y="110" class="text" style="font-size: 12px;">Node.js/Express</text>
+                            <text x="500" y="130" class="text" style="font-size: 11px;">Porta: 3000</text>
+                            
+                            <rect x="420" y="155" width="160" height="35" class="component backend" style="fill: #ffe0b2;" rx="8" />
+                            <text x="500" y="178" class="text" style="font-size: 11px;">📡 API REST</text>
+                            
+                            <rect x="420" y="200" width="160" height="35" class="component backend" style="fill: #ffe0b2;" rx="8" />
+                            <text x="500" y="223" class="text" style="font-size: 11px;">🔧 Middleware</text>
+                        </g>
+
+                        <!-- Serviço Python -->
+                        <g id="ia-service" data-tooltip="Serviço Python com Flask, responsável pela predição usando Machine Learning">
+                            <rect x="750" y="50" width="200" height="200" class="component ia" style="fill: url(#grad-ia);" />
+                            <text x="850" y="85" class="text">
+                                <tspan style="font-size: 16px;">🤖 Serviço IA</tspan>
+                            </text>
+                            <text x="850" y="110" class="text" style="font-size: 12px;">Python/Flask</text>
+                            <text x="850" y="130" class="text" style="font-size: 11px;">Porta: 5000</text>
+                            
+                            <rect x="770" y="155" width="160" height="35" class="component ia" style="fill: #e1bee7;" rx="8" />
+                            <text x="850" y="178" class="text" style="font-size: 11px;">🎯 /predict</text>
+                            
+                            <rect x="770" y="200" width="160" height="35" class="component ia" style="fill: #e1bee7;" rx="8" />
+                            <text x="850" y="223" class="text" style="font-size: 11px;">🧠 Modelo IA</text>
+                        </g>
+
+                        <!-- Armazenamento -->
+                        <g id="storage" data-tooltip="Armazenamento local de produtos, perguntas e uploads">
+                            <rect x="50" y="350" width="180" height="110" class="component storage" style="fill: url(#grad-storage);" />
+                            <text x="140" y="385" class="text">
+                                <tspan style="font-size: 15px;">💾 Armazenamento</tspan>
+                            </text>
+                            <text x="140" y="410" class="text" style="font-size: 11px;">📄 produtos.txt</text>
+                            <text x="140" y="430" class="text" style="font-size: 11px;">❓ perguntas.txt</text>
+                            <text x="140" y="450" class="text" style="font-size: 11px;">📁 uploads/</text>
+                        </g>
+
+                        <!-- Modelos -->
+                        <g id="models" data-tooltip="Modelos treinados e encoders salvos em formato pickle">
+                            <rect x="300" y="350" width="180" height="110" class="component storage" style="fill: url(#grad-storage);" />
+                            <text x="390" y="385" class="text">
+                                <tspan style="font-size: 15px;">📦 Modelos IA</tspan>
+                            </text>
+                            <text x="390" y="410" class="text" style="font-size: 11px;">🔮 modelo.pkl</text>
+                            <text x="390" y="430" class="text" style="font-size: 11px;">🔐 encoders.pkl</text>
+                            <text x="390" y="450" class="text" style="font-size: 11px;">📊 CSV Treino</text>
+                        </g>
+
+                        <!-- Treinamento -->
+                        <g id="training" data-tooltip="Scripts de treinamento do modelo usando Árvore de Decisão">
+                            <rect x="750" y="350" width="200" height="130" class="component training" style="fill: url(#grad-training);" />
+                            <text x="850" y="390" class="text">
+                                <tspan style="font-size: 15px;">🎓 Treinamento</tspan>
+                            </text>
+                            <text x="850" y="415" class="text" style="font-size: 11px;">🐍 importar_dados.py</text>
+                            <text x="850" y="435" class="text" style="font-size: 11px;">🌳 Árvore de Decisão</text>
+                            <text x="850" y="455" class="text" style="font-size: 11px;">✅ Validação Cruzada</text>
+                        </g>
+
+                        <!-- Setas de comunicação -->
+                        <!-- Frontend -> Backend -->
+                        <line x1="250" y1="110" x2="400" y2="110" class="arrow" id="arrow-1" />
+                        <text x="325" y="105" class="arrow-label">HTTP REST</text>
+
+                        <!-- Backend -> Serviço IA -->
+                        <line x1="600" y1="150" x2="750" y2="150" class="arrow" id="arrow-2" />
+                        <text x="675" y="145" class="arrow-label">HTTP POST</text>
+
+                        <!-- Backend -> Armazenamento -->
+                        <line x1="500" y1="250" x2="140" y2="350" class="arrow" id="arrow-3" />
+                        <text x="320" y="300" class="arrow-label">Lê/Escreve</text>
+
+                        <!-- Serviço IA -> Modelos -->
+                        <line x1="850" y1="250" x2="390" y2="350" class="arrow" id="arrow-4" />
+                        <text x="620" y="300" class="arrow-label">Carrega</text>
+
+                        <!-- Treinamento -> Modelos -->
+                        <line x1="750" y1="410" x2="480" y2="400" class="arrow" id="arrow-5" />
+                        <text x="615" y="405" class="arrow-label">Gera</text>
+
+                        <!-- Treinamento -> CSV -->
+                        <line x1="850" y1="480" x2="390" y2="450" class="arrow" id="arrow-6" />
+                        <text x="620" y="465" class="arrow-label">Lê CSV</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #e1f5ff, #b3e5fc); border-color: #01579b;"></div>
+                    <span><i class="fas fa-desktop"></i> Frontend</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-color: #e65100;"></div>
+                    <span><i class="fas fa-server"></i> Backend</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); border-color: #4a148c;"></div>
+                    <span><i class="fas fa-brain"></i> Serviço IA</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-color: #1b5e20;"></div>
+                    <span><i class="fas fa-database"></i> Armazenamento</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #fce4ec, #f8bbd0); border-color: #880e4f;"></div>
+                    <span><i class="fas fa-graduation-cap"></i> Treinamento</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Fluxo -->
+        <div id="flow" class="tab-content">
+            <div class="flow-section">
+                <h2 class="flow-title"><i class="fas fa-stream"></i> Fluxo de Recomendação de Produto</h2>
+                
+                <div class="flow-step">
+                    <span class="flow-step-number">1</span>
+                    <strong><i class="fas fa-play-circle"></i> Usuário inicia chat</strong>
+                    <p>Usuário clica em "Começar Agora" no frontend e inicia a interação</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">2</span>
+                    <strong><i class="fas fa-download"></i> Frontend busca perguntas</strong>
+                    <p>GET /api/perguntas → Backend retorna lista de perguntas ordenadas por prioridade</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">3</span>
+                    <strong><i class="fas fa-comment-dots"></i> Usuário responde perguntas</strong>
+                    <p>Frontend exibe perguntas sequencialmente e coleta respostas do usuário</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">4</span>
+                    <strong><i class="fas fa-upload"></i> Envio para Backend</strong>
+                    <p>POST /api/recomendar-produto com todas as respostas coletadas</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">5</span>
+                    <strong><i class="fas fa-cogs"></i> Backend formata dados</strong>
+                    <p>Valida respostas e converte para formato esperado pela IA (JSON estruturado)</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">6</span>
+                    <strong><i class="fas fa-rocket"></i> Chamada ao Serviço IA</strong>
+                    <p>HTTP POST para http://localhost:5000/predict com dados formatados</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">7</span>
+                    <strong><i class="fas fa-robot"></i> Processamento pela IA</strong>
+                    <p>Serviço Python aplica LabelEncoder, normaliza dados e faz predição usando Árvore de Decisão</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">8</span>
+                    <strong><i class="fas fa-sitemap"></i> Extrai regras de decisão</strong>
+                    <p>Analisa caminho percorrido na árvore de decisão para explicar a recomendação</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">9</span>
+                    <strong><i class="fas fa-undo"></i> Retorno ao Frontend</strong>
+                    <p>Backend retorna produto recomendado + regras de decisão + confiança da predição</p>
+                </div>
+
+                <div class="flow-step">
+                    <span class="flow-step-number">10</span>
+                    <strong><i class="fas fa-check-circle"></i> Exibição da recomendação</strong>
+                    <p>Frontend exibe produto recomendado com imagem, detalhes e explicações sobre a escolha</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Tecnologias -->
+        <div id="tech" class="tab-content">
+            <div class="flow-section">
+                <h2 class="flow-title"><i class="fas fa-code"></i> Stack Tecnológico</h2>
+                
+                <div class="tech-section">
+                    <h3><i class="fas fa-desktop"></i> Frontend</h3>
+                    <span class="tech-badge">HTML5</span>
+                    <span class="tech-badge">CSS3</span>
+                    <span class="tech-badge">JavaScript</span>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-server"></i> Backend</h3>
+                    <span class="tech-badge">Node.js</span>
+                    <span class="tech-badge">Express.js</span>
+                    <span class="tech-badge">Multer</span>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-brain"></i> Inteligência Artificial</h3>
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Flask</span>
+                    <span class="tech-badge">scikit-learn</span>
+                    <span class="tech-badge">pandas</span>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-database"></i> Armazenamento</h3>
+                    <span class="tech-badge">Arquivos TXT</span>
+                    <span class="tech-badge">CSV</span>
+                    <span class="tech-badge">Pickle (.pkl)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: API -->
+        <div id="api" class="tab-content">
+            <div class="flow-section">
+                <h2 class="flow-title"><i class="fas fa-plug"></i> Endpoints da API</h2>
+                
+                <div class="tech-section">
+                    <h3><i class="fas fa-server"></i> Backend Node.js (Porta 3000)</h3>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-get">GET</span>
+                        <strong>/api/produtos</strong> - Lista todos os produtos cadastrados
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-post">POST</span>
+                        <strong>/api/produtos</strong> - Cria novo produto (multipart/form-data)
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-get">GET</span>
+                        <strong>/api/perguntas</strong> - Lista todas as perguntas ordenadas
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-post">POST</span>
+                        <strong>/api/perguntas</strong> - Cria nova pergunta com opções de resposta
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-post">POST</span>
+                        <strong>/api/recomendar-produto</strong> - Obtém recomendação inteligente da IA
+                    </div>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-brain"></i> Serviço IA Python (Porta 5000)</h3>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-get">GET</span>
+                        <strong>/health</strong> - Verifica status do serviço (health check)
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <span class="endpoint-method method-post">POST</span>
+                        <strong>/predict</strong> - Realiza predição do produto ideal baseado nas respostas
+                    </div>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-info-circle"></i> Exemplo de Request - Recomendação</h3>
+                    <div style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">
+<pre style="margin: 0; color: #d4d4d4;">POST /api/recomendar-produto
+Content-Type: application/json
+
+{
+  "respostas": {
+    "1": "Industrial",
+    "2": "Acima de 10Kg",
+    "3": "Trifásico",
+    "4": "Carne, Frango",
+    "5": "Sim",
+    "6": "Não",
+    "7": "Não",
+    "8": "Acima de R$ 15,000,00",
+    "9": "Sim",
+    "10": "Até 7,5kW"
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-check-circle"></i> Exemplo de Response - Recomendação</h3>
+                    <div style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">
+<pre style="margin: 0; color: #d4d4d4;">{
+  "success": true,
+  "produto": "Moedor CAF 98 Trifásico",
+  "regras": [
+    "Para qual finalidade pretende usar o moedor? = Industrial",
+    "Quantos quilos precisa moer por minuto? = Acima de 10Kg",
+    "Qual é a voltagem que pretende utilizar? = Trifásico",
+    "Potência desejada = Até 7,5kW"
+  ],
+  "respostas": {
+    "Para qual finalidade pretende usar o moedor?": "Industrial",
+    "Quantos quilos precisa moer por minuto?": "Acima de 10Kg",
+    "Qual é a voltagem que pretende utilizar?": "Trifásico",
+    "O que irá moer?": "Carne, Frango",
+    "Prefere modelo mais fácil de limpar?": "Sim",
+    "Ruído é um fator importante?": "Não",
+    "O espaço físico é limitado?": "Não",
+    "Qual é a faixa de orçamento?": "Acima de R$ 15,000,00",
+    "Deseja função de remoagem?": "Sim",
+    "Potência desejada": "Até 7,5kW"
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="tech-section">
+                    <h3><i class="fas fa-brain"></i> Exemplo de Request - Serviço Python (/predict)</h3>
+                    <div style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9em; overflow-x: auto;">
+<pre style="margin: 0; color: #d4d4d4;">POST http://localhost:5000/predict
+Content-Type: application/json
+
+{
+  "finalidade": "Industrial",
+  "quantidade": "Acima de 10Kg",
+  "voltagem": "Trifásico",
+  "tipo_material": "Carne, Frango",
+  "facil_limpeza": "Sim",
+  "ruido_importante": "Não",
+  "espaco_limitado": "Não",
+  "orcamento": "Acima de R$ 15,000,00",
+  "remoagem": "Sim",
+  "potencia": "Até 7,5kW"
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        // Sistema de Tabs
+        function switchTab(tabName) {
+            // Remove active de todos os botões e conteúdos
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Adiciona active ao tab selecionado
+            event.target.closest('.tab-button').classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+
+        // Animação de Fluxo
+        let animationActive = false;
+        function toggleAnimation() {
+            animationActive = !animationActive;
+            const arrows = document.querySelectorAll('.arrow');
+            const button = event.target.closest('.control-button');
+            
+            if (animationActive) {
+                arrows.forEach(arrow => arrow.classList.add('animated'));
+                button.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+                
+                // Animar componentes sequencialmente
+                animateComponents();
+            } else {
+                arrows.forEach(arrow => arrow.classList.remove('animated'));
+                button.innerHTML = '<i class="fas fa-play"></i> Animar Fluxo';
+                
+                // Remover animação dos componentes
+                document.querySelectorAll('.component').forEach(comp => comp.classList.remove('active'));
+            }
+        }
+
+        function animateComponents() {
+            if (!animationActive) return;
+            
+            const components = ['frontend', 'backend', 'ia-service', 'storage', 'models', 'training'];
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                if (!animationActive || index >= components.length) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                const comp = document.getElementById(components[index]);
+                if (comp) {
+                    comp.querySelector('.component').classList.add('active');
+                    
+                    setTimeout(() => {
+                        if (comp) {
+                            comp.querySelector('.component').classList.remove('active');
+                        }
+                    }, 1500);
+                }
+                
+                index++;
+            }, 2000);
+        }
+
+        function resetDiagram() {
+            animationActive = false;
+            document.querySelectorAll('.arrow').forEach(arrow => arrow.classList.remove('animated'));
+            document.querySelectorAll('.component').forEach(comp => comp.classList.remove('active'));
+            
+            const button = document.querySelector('.control-button');
+            button.innerHTML = '<i class="fas fa-play"></i> Animar Fluxo';
+        }
+
+        // Tooltips para componentes SVG
+        const tooltip = document.getElementById('tooltip');
+        const svgGroups = document.querySelectorAll('g[data-tooltip]');
+        
+        svgGroups.forEach(group => {
+            group.addEventListener('mouseenter', (e) => {
+                const tooltipText = group.getAttribute('data-tooltip');
+                tooltip.textContent = tooltipText;
+                tooltip.classList.add('show');
+            });
+            
+            group.addEventListener('mousemove', (e) => {
+                tooltip.style.left = e.pageX + 15 + 'px';
+                tooltip.style.top = e.pageY + 15 + 'px';
+            });
+            
+            group.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('show');
+            });
+        });
+
+
+        // Adicionar efeito de clique nos badges
+        document.querySelectorAll('.tech-badge').forEach(badge => {
+            badge.addEventListener('click', function() {
+                this.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // Console Easter Egg
+        console.log('%c🤖 Sistema de Recomendação com IA', 'color: #667eea; font-size: 20px; font-weight: bold;');
+        console.log('%cArquitetura: Node.js + Python + Machine Learning', 'color: #764ba2; font-size: 14px;');
+        console.log('%cPowered by scikit-learn Decision Tree 🌳', 'color: #4caf50; font-size: 12px;');
+    </script>
+</body>
+</html>
+
